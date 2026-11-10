@@ -47,6 +47,34 @@ python -c "import sys; sys.path.insert(0,'scripts'); import download, tratamento
 
 Os arquivos são salvos em `data/raw/ano=AAAA/mes=MM/`. A pasta `data/` não é versionada.
 
+## Roadmap de desenvolvimento
+
+Projeto em desenvolvimento. A arquitetura-alvo está definida, e cada fase é entregue e testada antes da seguinte.
+
+| Fase | Etapa | Status | Entrega |
+|------|-------|--------|---------|
+| 1 | Ingestão | Concluída | Download de arquivos mensais, retentativas e descompactação |
+| 2 | Tratamento e validação | Concluída | Tipagem correta, checagens de qualidade e avisos (ex.: estornos) |
+| 3 | Carga | Não iniciada | Dados tratados em Parquet e envio ao S3 |
+| 4 | Consulta | Não iniciada | Catálogo e tabelas no Athena |
+| 5 | Modelagem | Não iniciada | Modelos dbt (staging, intermediate e marts) para três perguntas analíticas |
+| 6 | Infraestrutura | Não iniciada | Provisionamento com Terraform, desenvolvido junto das fases 3 e 4 |
+| 7 | Automação | Não iniciada | Agendamento com EventBridge e disparo com Lambda |
+| 8 | Documentação | Em andamento | README final, diagrama de arquitetura e guia de reprodução |
+
+### Perguntas analíticas
+
+1. Onde o dinheiro público é gasto, por órgão e município.
+2. Como os gastos evoluem ao longo do tempo.
+3. Quais contratos foram feitos por dispensa ou inexigibilidade de licitação.
+
+### Decisões registradas
+
+- **Arquivos em lote em vez da API:** a API do Portal exige filtros por unidade gestora e fase, o que torna a ingestão de um período completo complexa. Os arquivos mensais oficiais são mais simples e completos para este projeto.
+- **Validação em dois níveis:** problemas bloqueiam a carga, enquanto avisos (como estornos, que são normais na execução orçamentária) são registrados sem bloquear.
+- **Processamento:** a decisão entre Lambda e outro serviço para o processamento será tomada com base no tamanho medido dos arquivos.
+- **Custo:** os limites de uso gratuito da AWS são verificados na documentação oficial antes de cada fase que usa um serviço pago.
+
 ## Estrutura
 
 ```
